@@ -13,4 +13,4 @@ RUN apt-get -y update \
 
 EXPOSE 5001
 
-CMD gunicorn --bind 0.0.0.0:5001 wsgi
+CMD gunicorn --bind 0.0.0.0:5001 wsgi:app
