@@ -44,10 +44,9 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(self.response.getcode(), 200)
 
     def test_headers(self):
-        self.assertEqual(self.response.info().headers, [
-            'Content-Type: application/pdf',
-            'Content-Disposition: inline; filename=sample.pdf'
-        ])
+        headers = dict(self.response.info())
+        self.assertEqual(headers['Content-Type'], 'application/pdf')
+        self.assertEqual(headers['Content-Disposition'], 'inline; filename=sample.pdf')
 
     def test_body(self):
         self.assertEqual(self.response.read()[:4], b'%PDF')
