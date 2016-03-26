@@ -1,0 +1,13 @@
+sudo: required
+
+services:
+  - docker
+
+install:
+  - docker build -t weasyprint .
+  - docker run -d -p 5001:5001 --name weasyprint weasyprint
+
+script:
+  - docker ps | grep -q weasyprint
+  - curl -X POST -d @test.html --header "Content-Type:application/html" -i http://127.0.0.1:5001/sample > result.data
+  -
