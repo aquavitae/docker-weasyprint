@@ -1,5 +1,7 @@
 # docker-weasyprint
 
+[![Build Status](https://travis-ci.org/aquavitae/docker-weasyprint.svg?branch=master)](https://travis-ci.org/aquavitae/docker-weasyprint)
+
 [Weasyprint](http://weasyprint.org/) as a microservice in a docker image.
 
 # Usage
