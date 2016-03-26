@@ -13,5 +13,4 @@ install:
 
 script:
   - docker ps | grep -q weasyprint
-  - curl -X POST -d @test.html --header "Content-Type:application/html" -i http://127.0.0.1:5001/sample > result.data
-  -
+  - python test.py
