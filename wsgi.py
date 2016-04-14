@@ -27,15 +27,25 @@ def setup_logging():
     app.logger.addHandler(handler)
     app.logger.setLevel(logging.DEBUG)
 
-@app.route('/<name>', methods=['POST'])
-def generate(name='unnamed'):
-    app.logger.info('POST  /%s' % name)
+
+@app.route('/')
+def home():
+    return '''
+        <h1>PDF Generator</h1>
+        <p>POST to <code>/pdf?filename=myfile.pdf</code></p>
+    '''
+
+
+@app.route('/pdf', methods=['POST'])
+def generate():
+    name = request.args.get('filename', 'unnamed.pdf')
+    app.logger.info('POST  /pdf?filename=%s' % name)
     html = HTML(string=request.data)
     pdf = html.write_pdf()
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'inline; filename=%s.pdf' % name
-    app.logger.info('POST  /%s  ok' % name)
+    response.headers['Content-Disposition'] = 'inline;filename=%s' % name
+    app.logger.info('POST  /pdf?filename=%s  ok' % name)
     return response
 
 

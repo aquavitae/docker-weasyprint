@@ -17,12 +17,6 @@ html_data = '''
 '''.encode('utf-8')
 
 
-import urllib.request
-req = urllib.request.Request('http://www.example.com/')
-req.add_header('Referer', 'http://www.python.org/')
-r = urllib.request.urlopen(req)
-
-
 def request_factory(path='/'):
     url = 'http://127.0.0.1:5001%s' % path
     headers = {
@@ -34,7 +28,7 @@ def request_factory(path='/'):
 class TestAPI(unittest.TestCase):
 
     def setUp(self):
-        request = request_factory('/sample')
+        request = request_factory('/pdf?filename=sample.pdf')
         self.response = urllib.request.urlopen(request)
 
     def tearDown(self):
@@ -46,7 +40,7 @@ class TestAPI(unittest.TestCase):
     def test_headers(self):
         headers = dict(self.response.info())
         self.assertEqual(headers['Content-Type'], 'application/pdf')
-        self.assertEqual(headers['Content-Disposition'], 'inline; filename=sample.pdf')
+        self.assertEqual(headers['Content-Disposition'], 'inline;filename=sample.pdf')
 
     def test_body(self):
         self.assertEqual(self.response.read()[:4], b'%PDF')
