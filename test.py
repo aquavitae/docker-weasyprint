@@ -29,7 +29,7 @@ class TestAPI(unittest.TestCase):
 
     def setUp(self):
         request = request_factory('/pdf?filename=sample.pdf')
-        self.response = urllib.request.urlopen(request)
+        self.response = urlopen(request)
 
     def tearDown(self):
         self.response.close()
