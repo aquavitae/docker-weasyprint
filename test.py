@@ -54,7 +54,7 @@ class TestMultiple(unittest.TestCase):
         headers = {
             'Content-Type': 'application/json'
         }
-        data = json.dumps(['www.google.com', 'www.google.ru'])
+        data = json.dumps(['www.google.com', 'www.google.ru']).encode('utf-8')
         request = Request(url, data=data, headers=headers, method='POST')
         self.response = urlopen(request)
 
