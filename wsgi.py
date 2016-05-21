@@ -61,7 +61,7 @@ def generate():
 def multiple():
     name = request.args.get('filename', 'unnamed.pdf')
     app.logger.info('POST  /multiple?filename=%s' % name)
-    urls = json.loads(request.data)
+    urls = json.loads(request.data.decode('utf-8'))
     documents = [HTML(url=url).render() for url in urls]
     pdf = documents[0].copy([page for doc in documents for page in doc.pages]).write_pdf()
     response = make_response(pdf)
