@@ -49,7 +49,7 @@ class TestPdf(unittest.TestCase):
 class TestMultiple(unittest.TestCase):
 
     def setUp(self):
-        url = 'http://127.0.0.1:5001/multiple?filename=sample.pdf' % path
+        url = 'http://127.0.0.1:5001/multiple?filename=sample.pdf'
         headers = {
             'Content-Type': 'application/json'
         }
