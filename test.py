@@ -25,7 +25,7 @@ def request_factory(path='/'):
     return Request(url, data=html_data, headers=headers, method='POST')
 
 
-class TestAPI(unittest.TestCase):
+class TestPdf(unittest.TestCase):
 
     def setUp(self):
         request = request_factory('/pdf?filename=sample.pdf')
@@ -44,6 +44,34 @@ class TestAPI(unittest.TestCase):
 
     def test_body(self):
         self.assertEqual(self.response.read()[:4], b'%PDF')
+
+
+class TestMultiple(unittest.TestCase):
+
+    def setup(self):
+        url = 'http://127.0.0.1:5001/multiple?filename=sample.pdf' % path
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        data = json.dumps(['www.google.com', 'www.google.ru'])
+        request = Request(url, data=data, headers=headers, method='POST')
+        self.response = urlopen(request)
+
+    def tearDown(self):
+        self.response.close()
+
+    def test_response_code(self):
+        self.assertEqual(self.response.getcode(), 200)
+
+    def test_headers(self):
+        headers = dict(self.response.info())
+        self.assertEqual(headers['Content-Type'], 'application/pdf')
+        self.assertEqual(headers['Content-Disposition'], 'inline;filename=sample.pdf')
+
+    def test_body(self):
+        data = self.response.read()
+        pages = re.findall(rb'<<\s+/Type\s+/Page\b', data, re.MULTILINE|re.DOTALL)
+        self.assertEqual(len(pages), 2)
 
 
 if __name__ == '__main__':
