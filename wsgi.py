@@ -38,8 +38,8 @@ def home():
             <li>POST to <code>/pdf?filename=myfile.pdf</code>. The body should
                 contain html</li>
             <li>POST to <code>/multiple?filename=myfile.pdf</code>. The body
-                should contain a JSON list of URLs. The will each be rendered
-                and combined into a single pdf</li>
+                should contain a JSON list of html strings. They will each
+                be rendered and combined into a single pdf</li>
         </ul>
     '''
 
@@ -61,8 +61,8 @@ def generate():
 def multiple():
     name = request.args.get('filename', 'unnamed.pdf')
     app.logger.info('POST  /multiple?filename=%s' % name)
-    urls = json.loads(request.data.decode('utf-8'))
-    documents = [HTML(url=url).render() for url in urls]
+    htmls = json.loads(request.data.decode('utf-8'))
+    documents = [HTML(string=html).render() for html in htmls]
     pdf = documents[0].copy([page for doc in documents for page in doc.pages]).write_pdf()
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
