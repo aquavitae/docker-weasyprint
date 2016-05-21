@@ -16,7 +16,7 @@ html_data = '''
     <h1>Hello World</h1>
 </body>
 </html>
-'''.encode('utf-8')
+'''
 
 
 def request_factory(path='/'):
@@ -24,7 +24,7 @@ def request_factory(path='/'):
     headers = {
         'Content-Type': 'application/html'
     }
-    return Request(url, data=html_data, headers=headers, method='POST')
+    return Request(url, data=html_data.encode('utf-8'), headers=headers, method='POST')
 
 
 class TestPdf(unittest.TestCase):
