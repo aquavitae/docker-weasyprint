@@ -12,7 +12,8 @@ install:
   - docker run -d -p 5001:5001 --name weasyprint weasyprint
 
 script:
-  - docker ps | grep -q weasyprint
+  - docker ps | grep weasyprint
   - docker logs weasyprint
   - curl http://127.0.0.1:5001/health
   - python test.py
+  - docker logs weasyprint
