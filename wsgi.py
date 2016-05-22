@@ -53,7 +53,7 @@ def generate():
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'inline;filename=%s' % name
-    app.logger.info('POST  /pdf?filename=%s  ok' % name)
+    app.logger.info(' ==> POST  /pdf?filename=%s  ok' % name)
     return response
 
 
@@ -67,7 +67,7 @@ def multiple():
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'inline;filename=%s' % name
-    app.logger.info('POST  /pdf?filename=%s  ok' % name)
+    app.logger.info(' ==> POST  /multiple?filename=%s  ok' % name)
     return response
 
 
