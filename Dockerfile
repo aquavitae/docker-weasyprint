@@ -2,6 +2,7 @@ FROM python:3.5-onbuild
 
 RUN apt-get -y update \
     && apt-get install -y \
+        fonts-font-awesome \
         libcairo2 \
         libffi-dev \
         libgdk-pixbuf2.0-0 \
