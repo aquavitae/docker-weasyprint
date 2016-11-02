@@ -8,6 +8,7 @@ from weasyprint import HTML
 
 app = Flask('pdf')
 
+
 @app.route('/health')
 def index():
     return 'ok'
@@ -49,6 +50,19 @@ def generate():
     name = request.args.get('filename', 'unnamed.pdf')
     app.logger.info('POST  /pdf?filename=%s' % name)
     html = HTML(string=request.data)
+    pdf = html.write_pdf()
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline;filename=%s' % name
+    app.logger.info(' ==> POST  /pdf?filename=%s  ok' % name)
+    return response
+
+
+@app.route('/url', methods=['POST'])
+def generate_from_url():
+    name = request.args.get('filename', 'unnamed.pdf')
+    app.logger.info('POST  /pdf?filename=%s' % name)
+    html = HTML(request.data.decode('utf-8'))
     pdf = html.write_pdf()
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'

@@ -18,6 +18,8 @@ html_data = '''
 </html>
 '''
 
+test_url = "http://www.google.com"
+
 
 def request_factory(path='/'):
     url = 'http://127.0.0.1:5001%s' % path
@@ -28,7 +30,6 @@ def request_factory(path='/'):
 
 
 class TestPdf(unittest.TestCase):
-
     def setUp(self):
         request = request_factory('/pdf?filename=sample.pdf')
         self.response = urlopen(request)
@@ -48,8 +49,32 @@ class TestPdf(unittest.TestCase):
         self.assertEqual(self.response.read()[:4], b'%PDF')
 
 
-class TestMultiple(unittest.TestCase):
+class TestUrl(unittest.TestCase):
+    def setUp(self):
+        url = 'http://127.0.0.1:5001/url?filename=sample.pdf'
+        data = test_url.encode('utf-8')
+        headers = {
+            'Content-Type': 'text/plain'
+        }
+        request = Request(url, data=data, headers=headers, method='POST')
+        self.response = urlopen(request)
 
+    def tearDown(self):
+        self.response.close()
+
+    def test_response_code(self):
+        self.assertEqual(self.response.getcode(), 200)
+
+    def test_headers(self):
+        headers = dict(self.response.info())
+        self.assertEqual(headers['Content-Type'], 'application/pdf')
+        self.assertEqual(headers['Content-Disposition'], 'inline;filename=sample.pdf')
+
+    def test_body(self):
+        self.assertEqual(self.response.read()[:4], b'%PDF')
+
+
+class TestMultiple(unittest.TestCase):
     def setUp(self):
         url = 'http://127.0.0.1:5001/multiple?filename=sample.pdf'
         headers = {
@@ -72,7 +97,7 @@ class TestMultiple(unittest.TestCase):
 
     def test_body(self):
         data = self.response.read()
-        pages = re.findall(rb'<<\s+/Type\s+/Page\b', data, re.MULTILINE|re.DOTALL)
+        pages = re.findall(rb'<<\s+/Type\s+/Page\b', data, re.MULTILINE | re.DOTALL)
         self.assertEqual(len(pages), 2)
 
 
