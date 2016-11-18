@@ -10,7 +10,10 @@ RUN apt-get -y update \
         python-dev \
         python-lxml \
         shared-mime-info \
+        net-tools\
     && apt-get -y clean
+
+COPY /qhv2.004otf/*.* /usr/share/fonts/opentype/
 
 EXPOSE 5001
 
