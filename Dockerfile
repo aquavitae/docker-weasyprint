@@ -1,4 +1,4 @@
-FROM python:2.7-wheezy
+FROM python:3.5.2
 
 RUN apt-get -y update \
     && apt-get install -y \
