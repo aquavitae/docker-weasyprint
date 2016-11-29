@@ -1,8 +1,7 @@
-FROM python:3.5-onbuild
+FROM python:3.5.2
 
 RUN apt-get -y update \
     && apt-get install -y \
-        fonts-font-awesome \
         libcairo2 \
         libffi-dev \
         libgdk-pixbuf2.0-0 \
@@ -10,8 +9,22 @@ RUN apt-get -y update \
         python-dev \
         python-lxml \
         shared-mime-info \
+        net-tools\
+        git\
     && apt-get -y clean
+
+COPY /qhv2.004otf/*.* /usr/share/fonts/opentype/
+COPY /RobotoTTF/*.* /usr/share/fonts/truetype/
+
+WORKDIR /usr/src
+
+RUN git clone https://github.com/sander76/weasy-server.git
+
+WORKDIR /usr/src/weasy-server
+
+RUN pip install -r requirements.txt
 
 EXPOSE 5001
 
-CMD gunicorn --bind 0.0.0.0:5001 wsgi:app
+# CMD gunicorn --bind 0.0.0.0:5001 wsgi:app
+CMD python wsgi.py
