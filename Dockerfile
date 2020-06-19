@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.5-onbuild
 
 # install all the dependencies except libcairo2 from jessie
 RUN apt-get -y update \
