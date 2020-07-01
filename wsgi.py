@@ -6,7 +6,7 @@ import logging
 from functools import wraps
 
 from flask import Flask, request, make_response, abort
-from weasyprint import HTML
+from weasyprint import HTML, CSS
 
 app = Flask('pdf')
 
@@ -57,7 +57,7 @@ def home():
             <p>The following endpoints are available:</p>
             <ul>
                 <li>POST to <code>/pdf?filename=myfile.pdf</code>. The body should
-                    contain html</li>
+                    contain html or a JSON list of html strings and css strings: { "html": html, "css": [css-file-objects] }</li>
                 <li>POST to <code>/multiple?filename=myfile.pdf</code>. The body
                     should contain a JSON list of html strings. They will each
                     be rendered and combined into a single pdf</li>
@@ -70,8 +70,14 @@ def home():
 def generate():
     name = request.args.get('filename', 'unnamed.pdf')
     app.logger.info('POST  /pdf?filename=%s' % name)
-    html = HTML(string=request.data)
-    pdf = html.write_pdf()
+    if request.headers['Content-Type'] == 'application/json':
+        data = json.loads(request.data.decode('utf-8'))
+        html = HTML(string=data['html'])
+        css = [CSS(string=sheet) for sheet in data['css']]
+        pdf = html.write_pdf(stylesheets=css)
+    else:
+        html = HTML(string=request.data.decode('utf-8'))
+        pdf = html.write_pdf()
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'inline;filename=%s' % name
