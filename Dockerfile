@@ -1,4 +1,4 @@
-FROM python:3.5-onbuild
+FROM python:3.8-buster
 
 # install all the dependencies except libcairo2 from jessie
 RUN apt-get -y update \
@@ -12,6 +12,14 @@ RUN apt-get -y update \
         shared-mime-info \
         libcairo2 \
     && apt-get -y clean
+
+WORKDIR /usr/src/app
+
+COPY requirements.txt ./
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY wsgi.py ./
 
 EXPOSE 5001
 
