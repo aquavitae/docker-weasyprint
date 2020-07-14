@@ -1,12 +1,33 @@
 #!/usr/bin/env python
 
 import json
+import os
 import logging
+from functools import wraps
 
-from flask import Flask, request, make_response
-from weasyprint import HTML
+from flask import Flask, request, make_response, abort
+from weasyprint import HTML, CSS
 
 app = Flask('pdf')
+
+
+def authenticate(f):
+    @wraps(f)
+    def checkauth(*args, **kwargs):
+        if 'X_API_KEY' not in request.headers or os.environ.get('X_API_KEY') == request.headers['X_API_KEY']:
+            return f(*args, **kwargs)
+        else:
+            abort(401)
+
+    return checkauth
+
+
+def auth():
+    if app.config.from_envvar('X_API_KEY') == request.headers['X_API_KEY']:
+        return True
+    else:
+        abort(401)
+
 
 @app.route('/health')
 def index():
@@ -32,24 +53,31 @@ def setup_logging():
 @app.route('/')
 def home():
     return '''
-        <h1>PDF Generator</h1>
-        <p>The following endpoints are available:</p>
-        <ul>
-            <li>POST to <code>/pdf?filename=myfile.pdf</code>. The body should
-                contain html</li>
-            <li>POST to <code>/multiple?filename=myfile.pdf</code>. The body
-                should contain a JSON list of html strings. They will each
-                be rendered and combined into a single pdf</li>
-        </ul>
-    '''
+            <h1>PDF Generator</h1>
+            <p>The following endpoints are available:</p>
+            <ul>
+                <li>POST to <code>/pdf?filename=myfile.pdf</code>. The body should
+                    contain html or a JSON list of html strings and css strings: { "html": html, "css": [css-file-objects] }</li>
+                <li>POST to <code>/multiple?filename=myfile.pdf</code>. The body
+                    should contain a JSON list of html strings. They will each
+                    be rendered and combined into a single pdf</li>
+            </ul>
+        '''
 
 
 @app.route('/pdf', methods=['POST'])
+@authenticate
 def generate():
     name = request.args.get('filename', 'unnamed.pdf')
     app.logger.info('POST  /pdf?filename=%s' % name)
-    html = HTML(string=request.data)
-    pdf = html.write_pdf()
+    if request.headers['Content-Type'] == 'application/json':
+        data = json.loads(request.data.decode('utf-8'))
+        html = HTML(string=data['html'])
+        css = [CSS(string=sheet) for sheet in data['css']]
+        pdf = html.write_pdf(stylesheets=css)
+    else:
+        html = HTML(string=request.data.decode('utf-8'))
+        pdf = html.write_pdf()
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'inline;filename=%s' % name
@@ -58,6 +86,7 @@ def generate():
 
 
 @app.route('/multiple', methods=['POST'])
+@authenticate
 def multiple():
     name = request.args.get('filename', 'unnamed.pdf')
     app.logger.info('POST  /multiple?filename=%s' % name)
