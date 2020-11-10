@@ -61,13 +61,15 @@ def home():
                 <li>POST to <code>/multiple?filename=myfile.pdf</code>. The body
                     should contain a JSON list of html strings. They will each
                     be rendered and combined into a single pdf</li>
+                <li>POST to <code>/png?filename=myfile.png</code>. The body should
+                    contain html or a JSON list of html strings and css strings: { "html": html, "css": [css-file-objects] }</li>
             </ul>
         '''
 
 
 @app.route('/pdf', methods=['POST'])
 @authenticate
-def generate():
+def generatePdf():
     name = request.args.get('filename', 'unnamed.pdf')
     app.logger.info('POST  /pdf?filename=%s' % name)
     if request.headers['Content-Type'] == 'application/json':
@@ -82,6 +84,25 @@ def generate():
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'inline;filename=%s' % name
     app.logger.info(' ==> POST  /pdf?filename=%s  ok' % name)
+    return response
+
+@app.route('/png', methods=['POST'])
+@authenticate
+def generatePng():
+    name = request.args.get('filename', 'unnamed.png')
+    app.logger.info('POST  /png?filename=%s' % name)
+    if request.headers['Content-Type'] == 'application/json':
+        data = json.loads(request.data.decode('utf-8'))
+        html = HTML(string=data['html'])
+        css = [CSS(string=sheet) for sheet in data['css']]
+        pdf = html.write_pdf(stylesheets=css)
+    else:
+        html = HTML(string=request.data.decode('utf-8'))
+        png = html.write_png()
+    response = make_response(png)
+    response.headers['Content-Type'] = 'image/png'
+    response.headers['Content-Disposition'] = 'inline;filename=%s' % name
+    app.logger.info(' ==> POST  /png?filename=%s  ok' % name)
     return response
 
 
