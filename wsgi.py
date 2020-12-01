@@ -14,19 +14,14 @@ app = Flask('pdf')
 def authenticate(f):
     @wraps(f)
     def checkauth(*args, **kwargs):
-        if 'X_API_KEY' not in request.headers or os.environ.get('X_API_KEY') == request.headers['X_API_KEY']:
-            return f(*args, **kwargs)
-        else:
-            abort(401)
+        if 'X_API_KEY' in os.environ:
+            if 'X_API_KEY' not in request.headers:
+                abort(401)
+            if os.environ.get('X_API_KEY') != request.headers.get('X_API_KEY'):
+                abort(403)
+        return f(*args, **kwargs)
 
     return checkauth
-
-
-def auth():
-    if app.config.from_envvar('X_API_KEY') == request.headers['X_API_KEY']:
-        return True
-    else:
-        abort(401)
 
 
 @app.route('/health')
