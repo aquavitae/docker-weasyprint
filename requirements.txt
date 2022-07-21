@@ -1,3 +1,3 @@
-gunicorn==20.0.4
-WeasyPrint==51
-flask==1.1.2
+gunicorn==20.1.0
+WeasyPrint==56
+flask==2.1.3
