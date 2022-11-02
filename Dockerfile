@@ -1,16 +1,9 @@
-FROM python:3.8-buster
+FROM python:slim-bullseye
 
 # install all the dependencies except libcairo2 from jessie
 RUN apt-get -y update \
     && apt-get install -y \
-        fonts-font-awesome \
-        libffi-dev \
-        libgdk-pixbuf2.0-0 \
-        libpango1.0-0 \
-        python-dev \
-        python-lxml \
-        shared-mime-info \
-        libcairo2 \
+    python3-pip python3-cffi python3-brotli libpango-1.0-0 libpangoft2-1.0-0 \
     && apt-get -y clean
 
 WORKDIR /usr/src/app
